@@ -1,35 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Link, Route, Routes, useNavigate } from "react-router-dom";
+import Home from "./pages/Home.jsx";
+import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
+import PostDetail from "./pages/PostDetail.jsx";
+import CreatePost from "./pages/CreatePost.jsx";
+import Profile from "./pages/Profile.jsx";
+import Admin from "./pages/Admin.jsx";
+import { useAuth } from "./context/AuthContext.jsx";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+export default function App() {
+  const { user, logout } = useAuth();
+  const nav = useNavigate();
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="min-h-full">
+      <nav className="flex items-center justify-between px-6 py-3 border-b">
+        <Link to="/" className="font-bold">RedBlog</Link>
+        <div className="flex items-center gap-3">
+          <Link to="/" className="text-sm">Inicio</Link>
+          {user && <Link to="/create" className="text-sm">Nueva</Link>}
+          {user && <Link to="/profile" className="text-sm">Perfil</Link>}
+          {user?.role === "admin" && <Link to="/admin" className="text-sm">Admin</Link>}
+          {!user && <Link to="/login" className="text-sm">Entrar</Link>}
+          {!user && <Link to="/register" className="text-sm">Registro</Link>}
+          {user && <button className="text-sm" onClick={()=>{logout(); nav("/");}}>Salir</button>}
+        </div>
+      </nav>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/posts/:id" element={<PostDetail />} />
+        <Route path="/create" element={<CreatePost />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
+    </div>
+  );
 }
-
-export default App
